@@ -1,33 +1,31 @@
+//The RedisClient Class
 import { createClient } from 'redis';
 
 class RedisClient {
     constructor(){
-	const client = createClient();
-	client.on('error', err => console.log(err));
-	client.connect();
+	this.client = createClient();
+	this.connected = true;
+	this.client.on('error', err => console.log(err));
+	this.connected = false
+	this.client.on('connect', () => console.log('Connected Successfully'));
+	this.connected = true;
     }
 
-    isAlive(){
-	if (client.isOpen){
-	    return true;
-	}
-	return false;
+    async isAlive(){
+	return this.connected;
     }
 
     async get(key){
-	const value = await client.get(key);
+	const value = await this.client.get(key);
 	return value;
     }
 
     async set(key, value, time){
-	await client.set(key, value, timeout=time);
+	await this.client.set(key, value, 'EX', time);
     }
 
     async del(key){
-	await client.del(key, function(err, response){
-	    if (err) throw err;
-	    console.log(response);
-	});
+	await this.client.del(key);
     }
 }
 const redisClient = new RedisClient();

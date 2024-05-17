@@ -4,16 +4,15 @@ import redisClient from '../utils/redis';
 export default class AppController {
     static getStatus(req, res) {
 	res.status(200);
-	res.send((redis: redisClient.isAlive(), db: dbClient.isAlive() });
+	res.send({redis: redisClient.isAlive(), db: dbClient.isAlive() });
     }
 
     static getStats(req, res) {
 	Promise.all([dbClient.nbUsers(), dbClient.nbFiles()])
 	    .then(([usersCount, filesCount]) => {
-		res.status(200).json({ users: usersCount, files: filesCount });
-		    .catch((err) => {
-			res.status(500).json({ error: err.message });
-		    });
+		res.status(200).json({ users: usersCount, files: filesCount }).catch((err) => {
+	res.status(500).json({ error: err.message });
+	});
 	    });
     }
 }
